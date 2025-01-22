@@ -7,3 +7,7 @@ from .validations import (
     validationInwardCode,
     validationUKPostalCode
 )
+
+from .formatting import (
+    formatPostalCode
+)

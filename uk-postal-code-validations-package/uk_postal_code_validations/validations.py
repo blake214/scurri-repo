@@ -1,4 +1,5 @@
 import re
+from .formatting import formatPostalCode
 
 def validationArea(input:str) -> bool:
     """
@@ -11,7 +12,7 @@ def validationArea(input:str) -> bool:
         Bool: Returns true if a valid area code, false otherwise
     """
     regex = r"^[ABCDEFGHIJKLMNOPRSTUWYZ][ABCDEFGHKLMNOPQRSTUVWXY]?$"
-    return bool(re.fullmatch(regex, input))
+    return bool(re.fullmatch(regex, input.replace(" ", "").upper()))
 
 def validationDistrict(input:str) -> bool:
     """
@@ -24,7 +25,7 @@ def validationDistrict(input:str) -> bool:
         Bool: Returns true if a valid district code, false otherwise
     """
     regex = r"^[0-9][0-9ABCDEFGHJKPSTUW]?$"
-    return bool(re.fullmatch(regex, input.upper()))
+    return bool(re.fullmatch(regex, input.replace(" ", "").upper()))
 
 def validationSector(input:str) -> bool:
     """
@@ -37,7 +38,7 @@ def validationSector(input:str) -> bool:
         Bool: Returns true if a valid sector code, false otherwise
     """
     regex = r"^[0-9]$"
-    return bool(re.fullmatch(regex, input.upper()))
+    return bool(re.fullmatch(regex, input.replace(" ", "").upper()))
 
 def validationUnit(input:str) -> bool:
     """
@@ -50,7 +51,7 @@ def validationUnit(input:str) -> bool:
         Bool: Returns true if a valid unit code, false otherwise
     """
     regex = r"^[ABDEFGHJLNPQRSTUVWXY]{2}$"
-    return bool(re.fullmatch(regex, input.upper()))
+    return bool(re.fullmatch(regex, input.replace(" ", "").upper()))
 
 def validationOutwardCode(input:str) -> bool:
     """
@@ -69,8 +70,8 @@ def validationOutwardCode(input:str) -> bool:
         double_digit_districts = ["AB", "LL", "SO"]
         zeros_digit_areas = ["BL", "BS", "CM", "CR", "FY", "HA", "PR", "SL", "SS"]
 
-        # Convert to upper
-        input = input.upper()
+        # Convert to upper, and remove spaces
+        input = input.replace(" ", "").upper()
 
         # Declarations
         area = input[:i]
@@ -86,7 +87,7 @@ def validationOutwardCode(input:str) -> bool:
             if area in double_digit_districts and len(district) != 2:
                 return False
             # Zeros areas
-            if district == '0' and area not in zeros_digit_areas:
+            if district == "0" and area not in zeros_digit_areas:
                 return False
             
             return True
@@ -103,6 +104,9 @@ def validationInwardCode(input:str) -> bool:
     Returns:
         Bool: Returns true if a valid inward code, false otherwise
     """    
+    # Convert to upper, and remove spaces
+    input = input.replace(" ", "").upper()
+
     # Lets loop through the input and slice at certain intervals for validation, instead of creating a new nasty regex
     for i in range(1, len(input)):
         # Declarations
@@ -124,9 +128,12 @@ def validationUKPostalCode(input:str) -> bool:
     
     Returns:
         Bool: Returns true if a valid, false otherwise
-    """    
-    # Assume the string has its " " included
-    sub_strings = input.split(" ")
+    """
+    # Clean the input
+    cleaned_input = formatPostalCode(input)
+
+    # Assuming there is a " ", else will result in an invalidation
+    sub_strings = cleaned_input.split(" ")
 
     # Validate before we proceed
     if len(sub_strings) != 2:
@@ -137,3 +144,4 @@ def validationUKPostalCode(input:str) -> bool:
 
     # Validate and return
     return validationOutwardCode(outwards) and validationInwardCode(inwards)
+    
